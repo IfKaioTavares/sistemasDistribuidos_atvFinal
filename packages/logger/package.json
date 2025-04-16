@@ -1,0 +1,9 @@
+{
+  "name": "logger",
+  "version": "1.0.0",
+  "main": "src/logger.ts",
+  "types": "src/logger.ts",
+  "dependencies": {
+    "chalk": "^5.3.0"
+  }
+}

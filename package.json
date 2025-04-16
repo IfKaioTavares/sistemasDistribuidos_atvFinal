@@ -1,0 +1,14 @@
+{
+  "name": "atv-final",
+  "version": "1.0.0",
+  "private": true,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "workspaces": [
+    "client",
+    "server",
+    "packages/*"
+  ]
+}
