@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { logger } from "@logger";
+import { logger } from "logger";
 import { Sensor } from "./modules/sensor";
 import { startGRPCServer } from "./modules/grpc";
 import { startElectionListener, startElection } from "./modules/election";
@@ -7,7 +7,7 @@ import { replicateData, listenReplication } from "./modules/replication";
 import { requestAccessToCriticalSection, listenToExclusion } from "./modules/exclusion";
 import { startCheckpointing, loadLastCheckpoint } from "./modules/checkpoint";
 import { listenForSnapshot, startSnapshot } from "./modules/snapshot";
-import { startHeartbeat } from "./modules/heartbeat";
+import { startHeartbeat, startHeartbeatListener } from "./modules/heartbeat";
 import { setupMulticast } from "./modules/multicast";
 
 const nodeId = process.env.NODE_ID || "sensor-default";
@@ -28,6 +28,9 @@ listenReplication((replicated) => {
 });
 listenForSnapshot(nodeId, () => sensor.getLastData());
 startHeartbeat(nodeId);
+if (nodeId === "sensor-01") {
+  startHeartbeatListener();
+}
 setupMulticast(nodeId);
 
 // ⏲ Inicia comportamentos ativos
@@ -38,7 +41,7 @@ setInterval(() => {
 
 startCheckpointing(nodeId, () => sensor.getLastData());
 
-setTimeout(() => startElection(nodeId), 5000);
+setTimeout(() => startElection(nodeId), 10000); // tempo maior para dar tempo dos peers subirem
 
 setTimeout(() => {
   requestAccessToCriticalSection(nodeId, () => {

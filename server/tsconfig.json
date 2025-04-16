@@ -5,7 +5,7 @@
     "paths": {
       "shared": ["../packages/shared/src"],
       "logger": ["../packages/logger/src"],
-      "lamportClock": ["../packages/lamportClock/src"],
+      "lamport-clock": ["../packages/lamportClock/src"],
       "crypto-utils": ["../packages/crypto-utils/src"]
     }
   },

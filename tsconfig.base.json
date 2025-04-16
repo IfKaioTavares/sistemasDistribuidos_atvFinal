@@ -11,8 +11,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noUnusedLocals": true
+    "noImplicitAny": true
   },
   "exclude": ["node_modules", "dist"]
 }

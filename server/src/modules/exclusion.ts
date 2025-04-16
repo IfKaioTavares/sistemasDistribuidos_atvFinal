@@ -1,6 +1,6 @@
 import dgram from "dgram";
 import { logger } from "logger";
-import { LamportClock } from "lamportClock";
+import { LamportClock } from "lamport-clock";
 
 const MULTICAST_ADDRESS = process.env.MULTICAST_ADDRESS || "224.1.1.1";
 const MULTICAST_PORT = Number(process.env.MULTICAST_PORT || 5007);

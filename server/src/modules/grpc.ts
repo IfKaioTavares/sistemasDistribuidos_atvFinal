@@ -1,7 +1,7 @@
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import path from "path";
-import { Sensor } from "./sensor.ts";
+import { Sensor } from "./sensor";
 import { logger } from "logger";
 
 const PROTO_PATH = path.join(__dirname, "../../proto/sensor.proto");
@@ -40,6 +40,5 @@ export function startGRPCServer(sensor: Sensor) {
       return;
     }
     logger.info(`Servidor gRPC escutando na porta ${port}`);
-    server.start();
   });
 }

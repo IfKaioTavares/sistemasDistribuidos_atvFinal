@@ -1,0 +1,69 @@
+version: '3.9'
+
+services:
+  sensor-01:
+    build: 
+      context: ..
+    container_name: sensor-01
+    working_dir: /app/server 
+    environment:
+      NODE_ID: sensor-01
+      GRPC_PORT: 5001
+      SOCKET_PORT: 6001
+      MULTICAST_ADDRESS: 224.1.1.1
+      MULTICAST_PORT: 5007
+      CHECKPOINT_INTERVAL: 30000
+      ELECTION_PORT: 7001
+      COORDINATOR_HOST: sensor-01
+      COORDINATOR_PORT: 7000
+      KNOWN_NODES: sensor-02:7001,sensor-03:7001
+      KNOWN_NODE_COUNT: 3
+      IS_COORDINATOR: false
+    networks:
+      - sensors
+
+  sensor-02:
+    build: 
+      context: ..
+    container_name: sensor-02
+    working_dir: /app/server 
+    environment:
+      NODE_ID: sensor-02
+      GRPC_PORT: 5002
+      SOCKET_PORT: 6002
+      MULTICAST_ADDRESS: 224.1.1.1
+      MULTICAST_PORT: 5007
+      CHECKPOINT_INTERVAL: 30000
+      ELECTION_PORT: 7001
+      COORDINATOR_HOST: sensor-01
+      COORDINATOR_PORT: 7000
+      KNOWN_NODES: sensor-01:7001,sensor-03:7001
+      KNOWN_NODE_COUNT: 3
+      IS_COORDINATOR: false
+    networks:
+      - sensors
+
+  sensor-03:
+    build: 
+      context: ..
+    container_name: sensor-03
+    working_dir: /app/server 
+    environment:
+      NODE_ID: sensor-03
+      GRPC_PORT: 5003
+      SOCKET_PORT: 6003
+      MULTICAST_ADDRESS: 224.1.1.1
+      MULTICAST_PORT: 5007
+      CHECKPOINT_INTERVAL: 30000
+      ELECTION_PORT: 7001
+      COORDINATOR_HOST: sensor-01
+      COORDINATOR_PORT: 7000
+      KNOWN_NODES: sensor-01:7001,sensor-02:7001
+      KNOWN_NODE_COUNT: 3
+      IS_COORDINATOR: false
+    networks:
+      - sensors
+
+networks:
+  sensors:
+    driver: bridge

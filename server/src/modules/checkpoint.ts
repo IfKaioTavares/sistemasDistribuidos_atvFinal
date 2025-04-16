@@ -6,7 +6,7 @@ import { SensorData } from "shared";
 const INTERVAL = Number(process.env.CHECKPOINT_INTERVAL || 30000);
 const CHECKPOINT_DIR = "checkpoints";
 
-export function startCheckpointing(nodeId: string, getState: () => SensorData) {
+export function startCheckpointing(nodeId: string, getState: () => SensorData|null) {
   if (!fs.existsSync(CHECKPOINT_DIR)) {
     fs.mkdirSync(CHECKPOINT_DIR);
   }

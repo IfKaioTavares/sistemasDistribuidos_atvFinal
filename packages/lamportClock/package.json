@@ -1,5 +1,5 @@
 {
-  "name": "lamportClock",
+  "name": "lamport-clock",
   "version": "1.0.0",
   "main": "src/LamportClock.ts",
   "types": "src/LamportClock.ts"

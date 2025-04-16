@@ -11,7 +11,7 @@ const SNAPSHOT_DIR = "snapshots";
 let snapshotStarted = false;
 let recordedMessages: SensorData[] = [];
 
-export function listenForSnapshot(nodeId: string, getState: () => SensorData) {
+export function listenForSnapshot(nodeId: string, getState: () => SensorData | null) {
   const socket = dgram.createSocket({ type: "udp4", reuseAddr: true });
 
   socket.on("message", (msg) => {

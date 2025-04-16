@@ -4,40 +4,42 @@ import { logger } from "logger";
 const ELECTION_PORT = Number(process.env.ELECTION_PORT || 7001);
 const KNOWN_NODES = (process.env.KNOWN_NODES || "").split(","); // Ex: sensor-01:7001,sensor-02:7001
 
-let isCoordinator = false;
+let _isCoordinator = false;
+let isParticipating = false;
 
 export function startElection(nodeId: string) {
-  const myNumber = parseInt(nodeId.replace(/\D/g, ""), 10);
-  let higherExists = false;
+  if (isParticipating) return; // já está participando
+  isParticipating = true;
+  let responded = false;
+  const clients: net.Socket[] = [];
 
   for (const node of KNOWN_NODES) {
     const [host, portStr] = node.split(":");
     const port = Number(portStr);
-    const targetNumber = parseInt(host.replace(/\D/g, ""), 10);
+    if (isNaN(port) || host === nodeId) continue;
 
-    if (targetNumber > myNumber) {
-      const client = new net.Socket();
+    const client = new net.Socket();
+    clients.push(client);
 
-      client.connect(port, host, () => {
-        const message = JSON.stringify({ type: "ELECTION", from: nodeId });
-        client.write(message);
-        client.end();
-        higherExists = true;
-      });
+    client.connect(port, host, () => {
+      const message = JSON.stringify({ type: "ELECTION", from: nodeId });
+      client.write(message);
+      client.end();
+      responded = true;
+    });
 
-      client.on("error", () => {
-        logger.warn(`[ELECTION] Falha ao contactar ${host}`);
-      });
-    }
+    client.on("error", () => {
+      logger.warn(`[ELECTION] Falha ao contactar ${host}`);
+    });
   }
 
   setTimeout(() => {
-    if (!higherExists) {
-      isCoordinator = true;
+    if (!responded) {
+      _isCoordinator = true;
       logger.info(`[ELECTION] ${nodeId} virou COORDENADOR`);
       broadcastCoordinator(nodeId);
     }
-  }, 3000);
+  }, 4000);
 }
 
 function broadcastCoordinator(nodeId: string) {
@@ -62,10 +64,13 @@ export function startElectionListener(nodeId: string) {
       try {
         const message = JSON.parse(data.toString());
         if (message.type === "ELECTION") {
-          logger.info(`[ELECTION] Recebido pedido de eleição de ${message.from}`);
-          startElection(nodeId); // Responde participando
+          logger.info(
+            `[ELECTION] Recebido pedido de eleição de ${message.from}`
+          );
+          startElection(nodeId); // participa
         } else if (message.type === "COORDINATOR") {
-          isCoordinator = false;
+          _isCoordinator = false;
+          isParticipating = false;
           logger.info(`[ELECTION] ${message.from} é o novo coordenador`);
         }
       } catch {
@@ -75,6 +80,8 @@ export function startElectionListener(nodeId: string) {
   });
 
   server.listen(ELECTION_PORT, () => {
-    logger.info(`[ELECTION] Aguardando mensagens de eleição na porta ${ELECTION_PORT}`);
+    logger.info(
+      `[ELECTION] Aguardando mensagens de eleição na porta ${ELECTION_PORT}`
+    );
   });
 }

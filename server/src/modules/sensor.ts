@@ -1,16 +1,17 @@
 import { SensorData } from "shared";
-import { LamportClock } from "lamportClock";
+import { LamportClock } from "lamport-clock";
 import { logger } from "logger";
 
 export class Sensor {
   private id: string;
   private clock: LamportClock;
-  private lastData: SensorData;
+  private lastData: SensorData | null;
 
 
   constructor(id: string) {
     this.id = id;
     this.clock = LamportClock.getInstance();
+    this.lastData = null;
   }
 
   generateData(): SensorData {
@@ -27,7 +28,7 @@ export class Sensor {
     return data;
   }
 
-  getLastData(): SensorData {
+  getLastData(): SensorData| null {
     return this.lastData;
   }
 }
