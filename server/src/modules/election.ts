@@ -6,26 +6,27 @@ const KNOWN_NODES = (process.env.KNOWN_NODES || "").split(","); // Ex: sensor-01
 
 let _isCoordinator = false;
 let isParticipating = false;
+let currentCoordinator: string | null = null;
 
 export function startElection(nodeId: string) {
-  if (isParticipating) return; // já está participando
+  if (isParticipating) return;
   isParticipating = true;
-  let responded = false;
-  const clients: net.Socket[] = [];
+
+  let lowerNodeExists = false;
 
   for (const node of KNOWN_NODES) {
     const [host, portStr] = node.split(":");
     const port = Number(portStr);
-    if (isNaN(port) || host === nodeId) continue;
+
+    if (isNaN(port) || host === nodeId || host >= nodeId) continue; // só contata nós com ID MENOR
 
     const client = new net.Socket();
-    clients.push(client);
 
     client.connect(port, host, () => {
       const message = JSON.stringify({ type: "ELECTION", from: nodeId });
       client.write(message);
       client.end();
-      responded = true;
+      lowerNodeExists = true;
     });
 
     client.on("error", () => {
@@ -34,11 +35,16 @@ export function startElection(nodeId: string) {
   }
 
   setTimeout(() => {
-    if (!responded) {
+    if (!lowerNodeExists) {
       _isCoordinator = true;
+      currentCoordinator = nodeId;
       logger.info(`[ELECTION] ${nodeId} virou COORDENADOR`);
       broadcastCoordinator(nodeId);
+    } else {
+      logger.info(`[ELECTION] ${nodeId} aguardando o novo coordenador`);
     }
+
+    isParticipating = false;
   }, 4000);
 }
 
@@ -63,14 +69,14 @@ export function startElectionListener(nodeId: string) {
     socket.on("data", (data) => {
       try {
         const message = JSON.parse(data.toString());
+
         if (message.type === "ELECTION") {
-          logger.info(
-            `[ELECTION] Recebido pedido de eleição de ${message.from}`
-          );
-          startElection(nodeId); // participa
+          logger.info(`[ELECTION] Recebido pedido de eleição de ${message.from}`);
+          startElection(nodeId); // participa da eleição se tiver ID menor
         } else if (message.type === "COORDINATOR") {
           _isCoordinator = false;
           isParticipating = false;
+          currentCoordinator = message.from;
           logger.info(`[ELECTION] ${message.from} é o novo coordenador`);
         }
       } catch {
@@ -80,8 +86,14 @@ export function startElectionListener(nodeId: string) {
   });
 
   server.listen(ELECTION_PORT, () => {
-    logger.info(
-      `[ELECTION] Aguardando mensagens de eleição na porta ${ELECTION_PORT}`
-    );
+    logger.info(`[ELECTION] Aguardando mensagens de eleição na porta ${ELECTION_PORT}`);
   });
+}
+
+export function getCurrentCoordinator(): string | null {
+  return currentCoordinator;
+}
+
+export function isCoordinator(): boolean {
+  return _isCoordinator;
 }

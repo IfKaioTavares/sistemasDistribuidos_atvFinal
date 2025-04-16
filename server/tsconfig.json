@@ -9,5 +9,5 @@
       "crypto-utils": ["../packages/crypto-utils/src"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../scripts"]
 }

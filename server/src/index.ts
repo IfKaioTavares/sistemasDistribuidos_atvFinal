@@ -28,9 +28,7 @@ listenReplication((replicated) => {
 });
 listenForSnapshot(nodeId, () => sensor.getLastData());
 startHeartbeat(nodeId);
-if (nodeId === "sensor-01") {
-  startHeartbeatListener();
-}
+startHeartbeatListener();
 setupMulticast(nodeId);
 
 // ⏲ Inicia comportamentos ativos
