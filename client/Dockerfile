@@ -2,10 +2,9 @@ FROM node:22
 
 WORKDIR /app
 
+COPY ../tsconfig.base.json ./tsconfig.base.json
 COPY . .
 
 RUN npm install
-
-WORKDIR /app/server
 
 CMD ["npm", "run", "dev"]

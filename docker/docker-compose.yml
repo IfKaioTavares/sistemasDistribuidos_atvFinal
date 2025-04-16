@@ -64,6 +64,18 @@ services:
     networks:
       - sensors
 
+  client:
+    build:
+      context: ../client
+    container_name: client
+    working_dir: /app
+    environment:
+      GRPC_TARGETS: sensor-01:5001,sensor-02:5002,sensor-03:5003
+      MULTICAST_ADDRESS: 224.1.1.1
+      MULTICAST_PORT: 5007
+    networks:
+      - sensors
+
 networks:
   sensors:
     driver: bridge

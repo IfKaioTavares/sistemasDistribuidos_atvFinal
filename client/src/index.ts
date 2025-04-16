@@ -1,4 +1,11 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import "dotenv/config";
+import { fetchSensorDataAll } from "./modules/grpc";
+import { listenToAlerts } from "./modules/multicast";
 
-console.log(`[CLIENT] Cliente iniciado como ${process.env.NODE_ID || 'desconhecido'}`);
+fetchSensorDataAll("client-app");
+
+setInterval(() => {
+  fetchSensorDataAll("client-app");
+}, 10000);
+
+listenToAlerts();
