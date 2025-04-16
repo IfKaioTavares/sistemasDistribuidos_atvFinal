@@ -1,10 +1,13 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true
-  }
+    "baseUrl": ".",
+    "paths": {
+      "shared": ["../packages/shared/src"],
+      "logger": ["../packages/logger/src"],
+      "lamportClock": ["../packages/lamportClock/src"],
+      "crypto-utils": ["../packages/crypto-utils/src"]
+    }
+  },
+  "include": ["src"]
 }

@@ -8,7 +8,13 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "dotenv": "^16.3.1"
+    "@grpc/grpc-js": "^1.13.3",
+    "@grpc/proto-loader": "^0.7.13",
+    "crypto-utils": "*",
+    "dotenv": "^16.3.1",
+    "lamportClock": "*",
+    "logger": "*",
+    "shared": "*"
   },
   "devDependencies": {
     "ts-node-dev": "^2.0.0",
